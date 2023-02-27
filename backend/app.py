@@ -18,6 +18,7 @@ app = Flask(__name__)
 # -----------------------------------------------------------------
 # API endpoints
 
+@app.route('/')
 @app.route('/hello_world')
 def hello_world():
     return jsonify('hello, assassins')
