@@ -21,20 +21,21 @@ app = Flask(__name__)
 @app.route('/')
 @app.route('/hello_world')
 def hello_world():
-    response = jsonify('hello, assassins')
+    response = jsonify('hello, assassins.')
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
 
 # Define the API endpoint for getting the player kills
-@app.route('/api/game-stats/<string:game_name>', methods=['GET'])
+@app.route('/api/game-stats/<string:game_name>')
 def get_player_kills(game_name: str):
     collection = connect_to_db()
     if collection is None:
+        print('Failed connection to db')
         return {}
     game_info = collection.find_one({"name": game_name})
     if game_info is None:
+        print('Failed retrieval of game')
         return {}
-
     # Get the dictionary of player kills for the game
     player_kills = game_info['players']
 
@@ -48,11 +49,16 @@ def get_player_kills(game_name: str):
 def get_player_info(netid: str):
     collection = connect_to_db(collection_name="players")
     if collection is None:
+        print('Failed connection to db')
         return {}
     player_info = collection.find_one({"netid": netid})
     if player_info is None:
+        print(f'Failed retrieval of player: {netid} info')
         return {}
     
+    # remove object_id attribute to properly jsonify the object
+    player_info.pop('_id', None) 
+
     response = jsonify(player_info)
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
