@@ -6,6 +6,7 @@ import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
+import CircularProgress from '@mui/material/CircularProgress';
 // import { Typography } from '@mui/material';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -28,20 +29,23 @@ const darkTheme = createTheme({
 function App() {
   const API_URL = 'https://assassin-api.onrender.com';
   const gameName = 'test_game';
-  const [playerInfo, setPlayerInfo] = useState([]);
 
-  useEffect(() => {
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [playerInfo, setPlayerInfo] = React.useState([]);
+
+  React.useEffect(() => {
     fetch(`${API_URL}/api/game-stats/${gameName}`)
       .then(response => response.json())
       .then(game_stats => {
         const playerIds = Object.keys(game_stats);
-        Promise.all(playerIds.map(netid => fetch(`${API_URL}/api/players/${netid}`))).then(data => console.log(data))
+        Promise.all(playerIds.map(netid => fetch(`${API_URL}/api/players/${netid}`)))
           .then(responses => Promise.all(responses.map(response => response.json())))
           .then(players => {
             const updatedPlayerInfo = playerIds.map(netid => {
               const playerKills = game_stats[netid]["kills"];
               const playerIsAlive = game_stats[netid]["isAlive"];
               const playerInfo = players.find(player => player.netid === netid);
+              console.log(playerInfo.name, playerInfo.nickname, playerKills, playerIsAlive)
               return {
                 netid,
                 name: playerInfo.name,
@@ -51,6 +55,7 @@ function App() {
               };
             });
             setPlayerInfo(updatedPlayerInfo);
+            setIsLoading(false);
           });
       });
   }, []);
@@ -103,21 +108,22 @@ function App() {
         <div>
           <h1>Assassin Leaderboard</h1>
           <img src={ivyLogoAssassin} alt="Ivy Assassin" />
-          <Box
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-            minHeight="50vh"
-          >
-            <List>
-              {playerInfo.map(player => (
-                <ListItem key={player.playerId}>
-                  <ListItemText primary={`${player.name} (${player.nickname})`} secondary={`Kills: ${player.kills}`} />
-                </ListItem>
-              ))}
-            </List>
-          </Box>
-
+            <Box
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
+              minHeight="50vh"
+            >
+              {isLoading && (<CircularProgress />)}
+              {!isLoading && 
+              (<List>
+                {playerInfo.map(player => (
+                  <ListItem key={player.playerId}>
+                    <ListItemText primary={`${player.name} (${player.nickname})`} secondary={`Kills: ${player.kills}`} />
+                  </ListItem>
+                ))}
+              </List>)}
+            </Box>
         </div>
         <h3> {message} </h3>
       </div>

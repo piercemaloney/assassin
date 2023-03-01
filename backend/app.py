@@ -123,7 +123,7 @@ def update_game(game_info: dict):
         "dead_players": dead_players}})
 
 
-def new_player(netid: str, first_name: str, last_name: str, nickname: str):
+def new_player(netid: str, name: str, nickname: str):
     """
     creates a new player and adds it to the players collection in db
     """
@@ -134,8 +134,7 @@ def new_player(netid: str, first_name: str, last_name: str, nickname: str):
     # create a document for the new player
     player_info = {
         "netid": netid,
-        "first_name": first_name,
-        "last_name": last_name,
+        "name": name,
         "nickname": nickname
     }
 
