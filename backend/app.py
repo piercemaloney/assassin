@@ -11,7 +11,7 @@ from db_info import uri
 # -----------------------------------------------------------------
 # Flask
 
-from flask import Flask, jsonify
+from flask import Flask, jsonify, make_response
 app = Flask(__name__)
 
 
@@ -21,11 +21,11 @@ app = Flask(__name__)
 @app.route('/')
 @app.route('/hello_world')
 def hello_world():
-    response = jsonify('hello, assassins.')
+    response = make_response('Happy hunting.')
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
 
-# Define the API endpoint for getting the player kills
+# Define the API endpoint for getting the player stats (alive/kills)
 @app.route('/api/game-stats/<string:game_name>')
 def get_player_kills(game_name: str):
     collection = connect_to_db()
@@ -38,9 +38,13 @@ def get_player_kills(game_name: str):
         return {}
     # Get the dictionary of player kills for the game
     player_kills = game_info['players']
+    game_stats = {}
+    for netid, kills in player_kills.items():
+        is_alive = True if netid in game_info['alive_players'] else False
+        game_stats[netid] = {"kills": kills, "isAlive": is_alive}
 
     # Return the dictionary of player kills
-    response = jsonify(player_kills)
+    response = jsonify(game_stats)
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
 
