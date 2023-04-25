@@ -34,29 +34,11 @@ function App() {
   const [playerInfo, setPlayerInfo] = React.useState([]);
 
   React.useEffect(() => {
-    fetch(`${API_URL}/api/game-stats/${gameName}`)
+    fetch(`${API_URL}/api/game-players/${gameName}`)
       .then(response => response.json())
-      .then(game_stats => {
-        const playerIds = Object.keys(game_stats);
-        Promise.all(playerIds.map(netid => fetch(`${API_URL}/api/players/${netid}`)))
-          .then(responses => Promise.all(responses.map(response => response.json())))
-          .then(players => {
-            const updatedPlayerInfo = playerIds.map(netid => {
-              const playerKills = game_stats[netid]["kills"];
-              const playerIsAlive = game_stats[netid]["isAlive"];
-              const playerInfo = players.find(player => player.netid === netid);
-              return {
-                netid,
-                name: playerInfo.name,
-                nickname: playerInfo.nickname,
-                fullAssassinName: playerInfo.fullAssassinName,
-                kills: playerKills,
-                isAlive: playerIsAlive
-              };
-            });
-            setPlayerInfo(updatedPlayerInfo);
-            setIsLoading(false);
-          });
+      .then(players => {
+        setPlayerInfo(players);
+        setIsLoading(false);
       });
   }, []);
 
