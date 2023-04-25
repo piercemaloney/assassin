@@ -27,8 +27,7 @@ const darkTheme = createTheme({
 // TODO: Deploy to render, make list optimized for mobile and look cooler (with avatars)
 
 function App() {
-  // const API_URL = 'https://assassin-api.onrender.com';
-  const API_URL = 'http://127.0.0.1:5000';
+  const API_URL = 'https://assassin-api.onrender.com';
   const gameName = 'ivy';
 
   const [isLoading, setIsLoading] = React.useState(true);
