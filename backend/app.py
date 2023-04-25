@@ -75,6 +75,38 @@ def get_player_info_response(netid: str):
     return response
 
 
+@app.route('/api/game-players/<string:game_name>', methods=['GET'])
+def get_game_players_info(game_name: str):
+    """API endpoint for assassin leaderboard. Gets all necessary info"""
+    collection = connect_to_db()
+    if collection is None:
+        print('Failed connection to db')
+        return {}
+
+    game_info = collection.find_one({"name": game_name})
+    if game_info is None:
+        print('Failed retrieval of game')
+        return {}
+
+    players_collection = connect_to_db(collection_name="players")
+    if players_collection is None:
+        print('Failed connection to db')
+        return {}
+
+    players_info = players_collection.find({"netid": {"$in": game_info['alive_players'] + game_info['dead_players']}})
+    players_info = [player for player in players_info]
+
+    for player in players_info:
+        player.pop('_id', None)  # remove object_id attribute to properly jsonify the object
+        player['kills'] = game_info['players'][player['netid']]
+        player['isAlive'] = player['netid'] in game_info['alive_players']
+
+    response = jsonify(players_info)
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
+
+
+
 # --------------------------------
 # Admin
 

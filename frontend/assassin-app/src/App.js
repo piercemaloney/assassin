@@ -24,10 +24,10 @@ const darkTheme = createTheme({
 });
 
 
-// TODO: Deploy to render, make list optimized for mobile and look cooler (with avatars)
-
 function App() {
   const API_URL = 'https://assassin-api.onrender.com';
+  // const API_URL = 'http://127.0.0.1:5000'; // For local testing
+  
   const gameName = 'ivy';
 
   const [isLoading, setIsLoading] = React.useState(true);
@@ -45,7 +45,6 @@ function App() {
               const playerKills = game_stats[netid]["kills"];
               const playerIsAlive = game_stats[netid]["isAlive"];
               const playerInfo = players.find(player => player.netid === netid);
-              console.log(playerInfo.name, playerInfo.nickname, playerKills, playerIsAlive)
               return {
                 netid,
                 name: playerInfo.name,
